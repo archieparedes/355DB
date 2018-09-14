@@ -19,12 +19,12 @@ CREATE TABLE TRAVELER(
 );
 
 CREATE TABLE HOTEL(
-    hotelID VARCHAR2(4),
+    ID VARCHAR2(4),
     hotelName VARCHAR2(25),
     City VARCHAR2(20) NOT NULL,
 -- CONSTRAINTS --
     CONSTRAINT HOTEL_PK
-        PRIMARY KEY(hotelID) -- Primary Key
+        PRIMARY KEY(ID) -- Primary Key
 );
 
 CREATE TABLE RESERVATION(
@@ -43,7 +43,7 @@ CREATE TABLE RESERVATION(
         REFERENCES TRAVELER(ID), -- travelerID becomes ID from TRAVELER table
     CONSTRAINT RESERVATION_FK2
         FOREIGN KEY(hotelID)
-        REFERENCES HOTEL(hotelID) -- hotelID becomes ID from HOTEL table
+        REFERENCES HOTEL(ID) -- hotelID becomes ID from HOTEL table
 );
 -- DATA INSERT --
 INSERT INTO HOTEL VALUES('58aa','Hilton Chicago', 'Chicago');
