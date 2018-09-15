@@ -5,12 +5,13 @@ Septemeber 12, 2018
 */
 
 -- DROPS --
+DROP TABLE RESERVATION;
 DROP TABLE TRAVELER;
 DROP TABLE HOTEL;
-DROP TABLE RESERVATION;
 
+-- TABLE CREATION --
 CREATE TABLE TRAVELER(
-    ID NUMBER(9),
+    ID CHAR(9),
     firstName VARCHAR2(20),
     lastName VARCHAR2(20),
     PHONE CHAR(10),
@@ -19,20 +20,22 @@ CREATE TABLE TRAVELER(
 );
 
 CREATE TABLE HOTEL(
-    hotelID VARCHAR2(4),
+    ID CHAR(4),
     hotelName VARCHAR2(25),
     City VARCHAR2(20) NOT NULL,
+    
 -- CONSTRAINTS --
     CONSTRAINT HOTEL_PK
-        PRIMARY KEY(hotelID) -- Primary Key
+        PRIMARY KEY(ID) -- Primary Key
 );
 
 CREATE TABLE RESERVATION(
-    travelerID NUMBER(9), -- Foreign Key
-    hotelID VARCHAR2(4), -- Foreign Key
+    travelerID CHAR(9), -- Foreign Key
+    hotelID CHAR(4), -- Foreign Key
     startDate DATE,
     endDate DATE,
-    Confirmation CHAR(10),
+    Confirmation VARCHAR2(10),
+    
 -- CONSTRAINTS --
     CONSTRAINT endDateCheck
         CHECK(endDate > startDate),
@@ -43,15 +46,21 @@ CREATE TABLE RESERVATION(
         REFERENCES TRAVELER(ID), -- travelerID becomes ID from TRAVELER table
     CONSTRAINT RESERVATION_FK2
         FOREIGN KEY(hotelID)
-        REFERENCES HOTEL(hotelID) -- hotelID becomes ID from HOTEL table
+        REFERENCES HOTEL(ID) -- hotelID becomes ID from HOTEL table
 );
+
 -- DATA INSERT --
 INSERT INTO HOTEL VALUES('58aa','Hilton Chicago', 'Chicago');
 INSERT INTO HOTEL VALUES('57ab', 'Chula Vista', 'Wisconsin Dells');
-INSERT INTO HOTEL VALUES('56ac', 'JW Marrioit', 'Chicago');
+INSERT INTO HOTEL VALUES('56ac', 'JW Marriot', 'Chicago');
 INSERT INTO HOTEL VALUES('55ba', 'Holiday Inn', 'Mount Prospect');
 
 INSERT INTO TRAVELER VALUES(189258658, 'Archie', 'Paredes','6303282828');
+INSERT INTO TRAVELER VALUES(234512374, 'David', 'Bucio','6303626262');
 INSERT INTO TRAVELER VALUES(132330658, 'Ryan', 'Fogarty','6307484848');
-INSERT INTO TRAVELER VALUES(598669909, 'Aloy', 'Paredes','6303272727');
-INSERT INTO TRAVELER VALUES(232456674, 'David', 'Bucio','7935555555');
+
+INSERT INTO RESERVATION VALUES(234512374,'58aa', '12-Sep-2017', '18-Sep-2017', '2345RF56aa');
+INSERT INTO RESERVATION VALUES(132330658,'56ac', '12-Sep-2018', NULL, '1323RF56ac');
+INSERT INTO RESERVATION VALUES(189258658,'57ab', '01-Jan-2018', '11-Jan-2018', '1892AP57ab');
+INSERT INTO RESERVATION VALUES(189258658,'55ba', '10-Jul-2018', '11-Jul-2018', '1892AP55ba');
+INSERT INTO RESERVATION VALUES(189258658,'58aa', '03-Nov-2017', '21-Nov-2017', '1892AP58aa');
