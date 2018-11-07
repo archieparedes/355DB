@@ -1,0 +1,92 @@
+DROP TABLE ENROLLMENT CASCADE CONSTRAINTS;
+DROP TABLE SECTION CASCADE CONSTRAINTS;
+
+CREATE TABLE SECTION(
+ SectionID 	CHAR(5),
+ Course	VARCHAR2(7),
+ Students	NUMBER DEFAULT 0,
+ CONSTRAINT PK_SECTION 
+		PRIMARY KEY (SectionID)
+);
+
+CREATE TABLE ENROLLMENT(
+ SectionID	CHAR(5),
+ StudentID	CHAR(7),
+ CONSTRAINT PK_ENROLLMENT 
+		PRIMARY KEY (SectionID, StudentID),
+ CONSTRAINT FK_ENROLLMENT_SECTION 
+		FOREIGN KEY (SectionID)
+		REFERENCES SECTION (SectionID)
+);
+
+-- Throw an error if more than 5 enrollments. Also, increase cound of SECTION.Students
+CREATE or REPLACE TRIGGER only5
+BEFORE INSERT on ENROLLMENT
+FOR EACH ROW
+DECLARE
+    counter Number;
+BEGIN
+    SELECT COUNT(*) INTO counter
+    FROM ENROLLMENT
+    WHERE SectionID = :new.SectionID;
+    counter := counter + 1;
+    IF counter > 5 THEN
+       RAISE_APPLICATION_ERROR(-20201,'Section is full');
+    ELSIF counter <= 5 THEN
+        UPDATE SECTION SET SECTION.Students = counter WHERE SECTION.SectionID = :new.SectionID;
+    END IF;
+END;
+/
+
+-- when deleted from ENROLLMENT, decrement Students from SECTION
+CREATE or REPLACE TRIGGER decrement
+BEFORE DELETE on ENROLLMENT
+FOR EACH ROW
+BEGIN
+    UPDATE SECTION 
+    SET Students = Students - 1 
+    WHERE SectionID = :old.SectionID;
+END;
+/
+
+-- Throw an errro if user tries updateding ENROLLMENT
+CREATE or REPLACE TRIGGER noUpdatesPls
+BEFORE UPDATE on ENROLLMENT
+FOR EACH ROW
+BEGIN
+    RAISE_APPLICATION_ERROR(-20201,'Update is not allowed in ENROLLMENT');
+END;
+/
+
+
+
+
+INSERT INTO SECTION (SectionID, Course) VALUES ( '12345', 'CSC 355' );
+INSERT INTO SECTION (SectionID, Course) VALUES ( '22109', 'CSC 309' );
+INSERT INTO SECTION (SectionID, Course) VALUES ( '99113', 'CSC 300' );
+INSERT INTO SECTION (SectionID, Course) VALUES ( '99114', 'CSC 300' );
+COMMIT;
+--SELECT * FROM SECTION;
+
+INSERT INTO ENROLLMENT VALUES ('12345', '1234567');
+INSERT INTO ENROLLMENT VALUES ('12345', '2234567');
+INSERT INTO ENROLLMENT VALUES ('12345', '3234567');
+INSERT INTO ENROLLMENT VALUES ('12345', '4234567');
+INSERT INTO ENROLLMENT VALUES ('12345', '5234567');
+
+INSERT INTO ENROLLMENT VALUES ('12345', '6234563'); -- error
+
+DELETE FROM ENROLLMENT WHERE StudentID = '1234567'; -- decrement student by 1
+
+UPDATE Enrollment -- should spit out an error
+SET StudentID = '7654321'
+WHERE StudentID = '4234567';
+
+SELECT * FROM Section;
+SELECT * FROM Enrollment;
+
+
+
+
+
+
