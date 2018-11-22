@@ -1,0 +1,130 @@
+package jdbc2;
+
+import java.sql.*;
+import java.util.Scanner;
+
+public class jdbc2 {
+    public static void main(String args[]){
+        try{
+        	Class.forName("oracle.jdbc.driver.OracleDriver");
+            Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@acadoradbprd01.dpu.depaul.edu:1521:ACADPRD0", "tyu14", "cdm1894236");
+            Statement state = conn.createStatement();
+
+            String dropTable = "DROP TABLE part";
+
+            String createTable = "create table part (" +
+                    "  p_partkey     integer     not null," +
+                    "  p_name        varchar(22) not null," +
+                    "  p_mfgr        varchar(6)     not null," +
+                    "  p_category    varchar(7)     not null," +
+                    "  p_brand1      varchar(9)     not null," +
+                    "  p_color       varchar(11) not null," +
+                    "  p_type        varchar(25) not null," +
+                    "  p_size        integer     not null," +
+                    "  p_container   varchar(10)    not null" +
+                    ");";
+
+            try{
+                state.executeUpdate(dropTable);
+                System.out.println("Table dropped!");
+            }
+            catch(Exception e){
+                System.out.println("Drop table failed: \n" + e);
+            }
+
+            try{
+                state.executeUpdate(createTable);
+                System.out.println("Table created!");
+            }
+            catch(Exception e){
+                System.out.println("Create Table failed: \n" + e);
+            }
+
+            String alter = "alter table part" +
+                    "  add primary key (p_partkey);";
+            state.executeUpdate(alter);
+
+            String ins = "INSERT INTO part VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement insPart = conn.prepareStatement(ins);
+
+            int i;
+            int[] p_partkey = new int[]{1233,2442,3113,4215,3465,6234,7123,8412,9123,1045,1451,1122,1233,1344,1455,1566,1677,1128,1239,2760};
+            for(i = 0; i < p_partkey.length; i++){
+                insPart.setInt(1, p_partkey[i]);
+                insPart.executeUpdate();
+            }
+
+            for(i = 0; i < p_partkey.length; i++){
+                String dropPPK = "DROP FROM part WHERE p_partkey = " + p_partkey[i];
+                state.executeUpdate(dropPPK);
+            }
+
+            System.out.println("Enter p_partkey: ");
+            @SuppressWarnings("resource")
+            Scanner ppk = new Scanner(System.in);
+            int p_partk = ppk.nextInt();
+
+            System.out.println("Enter part name: ");
+            @SuppressWarnings("resource")
+            Scanner pn = new Scanner(System.in);
+            String p_name = pn.next();
+
+            System.out.println("Enter p_mfgr: ");
+            @SuppressWarnings("resource")
+            Scanner pm = new Scanner(System.in);
+            String p_mfgr = pm.next();
+
+            System.out.println("Enter part category: ");
+            @SuppressWarnings("resource")
+            Scanner pcat = new Scanner(System.in);
+            String p_category = pcat.next();
+
+            System.out.println("Enter part brand: ");
+            @SuppressWarnings("resource")
+            Scanner pb = new Scanner(System.in);
+            String p_brand1 = pb.next();
+
+            System.out.println("Enter part color: ");
+            @SuppressWarnings("resource")
+            Scanner pcol = new Scanner(System.in);
+            String p_color = pcol.next();
+
+            System.out.println("Enter part type: ");
+            @SuppressWarnings("resource")
+            Scanner pt = new Scanner(System.in);
+            String p_type = pt.next();
+
+            System.out.println("Enter part size: ");
+            @SuppressWarnings("resource")
+            Scanner ps = new Scanner(System.in);
+            int p_size = ps.nextInt();
+
+            System.out.println("Enter part container: ");
+            @SuppressWarnings("resource")
+            Scanner pcon = new Scanner(System.in);
+            String p_container = pcon.next();
+
+            insPart.setInt(1, p_partk);
+            insPart.setString(2, p_name);
+            insPart.setString(3, p_mfgr);
+            insPart.setString(4, p_category);
+            insPart.setString(5, p_brand1);
+            insPart.setString(6, p_color);
+            insPart.setString(7, p_type);
+            insPart.setInt(8, p_size);
+            insPart.setString(9, p_container);
+            insPart.executeUpdate();
+
+            ResultSet result = state.executeQuery("SELECT * FROM part");
+            while(result.next()){
+                System.out.println(result.getInt(1) + " " + result.getString(2) + " " + result.getString(3) + " " + result.getString(4) + " " + result.getString(5) + " " + result.getString(6) + " " + result.getString(7) + " " + result.getInt(8) + " " + result.getString(9) + " " );
+            }
+
+            conn.close();
+        }
+        catch(Exception e){
+            System.out.println("Connection Failed \n" + e);
+        }
+
+    }
+}
